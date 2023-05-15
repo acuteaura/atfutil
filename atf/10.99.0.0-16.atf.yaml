@@ -1,0 +1,7 @@
+superBlock: 10.99.0.0/16
+name: aurelia superblock
+allocations:
+- cidr: 10.99.42.0/23
+  description: homestead
+  ref:
+    subAlloc: "10.99.42.0-23.md"
