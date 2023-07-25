@@ -26,8 +26,8 @@ import (
 	"io"
 	"strings"
 
-	"ops-networking/pkg/atf"
-	"ops-networking/pkg/netcalc"
+	"atfutil/pkg/atf"
+	"atfutil/pkg/netcalc"
 )
 
 var (

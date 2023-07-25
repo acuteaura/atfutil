@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"ops-networking/pkg/cli/atfutil"
+	"atfutil/pkg/cli/atfutil"
 )
 
 func main() {

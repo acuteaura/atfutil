@@ -31,12 +31,12 @@ import (
 
 	"github.com/pkg/errors"
 
-	"ops-networking/pkg/render"
+	"atfutil/pkg/render"
 
-	"ops-networking/pkg/netcalc"
+	"atfutil/pkg/netcalc"
 
 	"github.com/go-yaml/yaml"
-	"ops-networking/pkg/atf"
+	"atfutil/pkg/atf"
 
 	"github.com/spf13/cobra"
 )
@@ -182,6 +182,11 @@ var allocCmd = &cobra.Command{
 	Short: "allocate a new subnet",
 	Long:  "allocate a new subnet, the smallest fitting free slice is automatically found and allocated to keep your IP space fragmentation low",
 	Run: func(cmd *cobra.Command, args []string) {
+		// output filename is set and in-place is set, 
+		if *outputFilename != "-" && *inPlace {
+			quitWithError(errors.New("cannot use --output-file and --in-place at the same time"))
+		}
+		
 		inFile, err := getInputFile(*inputFilename)
 		if err != nil {
 			quitWithError(err)
@@ -209,13 +214,18 @@ var allocCmd = &cobra.Command{
 		}
 
 		atfFile.Allocations = append(atfFile.Allocations, atf.Allocation{
-			Network:     &atf.IPNet{net},
+			Network:     &atf.IPNet{IPNet: net},
 			Description: *allocDesc,
 		})
 
 		outBytes, err := yaml.Marshal(atfFile)
 		if err != nil {
 			quitWithError(err)
+		}
+
+		// output filename is not set and in-place is set
+		if *outputFilename == "-" && *inPlace {
+			*outputFilename = *inputFilename
 		}
 
 		outFile, err := getOutputFile(*outputFilename)
@@ -238,6 +248,7 @@ func Command() *cobra.Command {
 
 var inputFilename *string
 var outputFilename *string
+var inPlace *bool
 
 var renderFree *bool
 var renderFormat *string
@@ -258,4 +269,5 @@ func init() {
 
 	allocSize = allocCmd.Flags().IntP("size", "s", -1, "size of the network to allocate")
 	allocDesc = allocCmd.Flags().StringP("description", "d", "", "description for the newly allocated subnet")
+	inPlace = allocCmd.PersistentFlags().BoolP("in-place", "i", false, "modify the input file in place")
 }

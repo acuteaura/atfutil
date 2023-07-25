@@ -27,7 +27,7 @@ import (
 	"net"
 	"sort"
 
-	"ops-networking/pkg/cidr"
+	"atfutil/pkg/cidr"
 )
 
 const AWS_MIN_SUBNET_SIZE = 28

@@ -1,4 +1,4 @@
-module ops-networking
+module atfutil
 
 go 1.20
 
