@@ -2,6 +2,25 @@ superBlock: 10.99.0.0/16
 name: aurelia superblock
 allocations:
 - cidr: 10.99.42.0/23
-  description: homestead
-  ref:
-    subAlloc: "10.99.42.0-23.md"
+  ident: homestead
+  description: the entire network for homstead
+  subAlloc:
+  - cidr: 10.99.42.0/28
+    ident: akkoma
+    ref:
+      azure:
+        subscription: "test-sub-1"
+        resourceGroup: "production"
+        virtualNetwork: "vnet-123"
+      git: https://github.com/acuteaura/atfutil
+    description: "very good network for akkoma"
+  - cidr: 10.99.42.16/28
+    ident: seaweeds
+  - cidr: 10.99.42.32/28
+    ident: vault
+  - cidr: 10.99.42.48/28
+    ident: keycloak
+  - cidr: 10.99.42.64/27
+    ident: synapse
+  - cidr: 10.99.42.96/27
+    ident: metrics

@@ -17,13 +17,15 @@
    express or implied.
  * See the Licence for the specific language governing
    permissions and limitations under the Licence.
- */
+*/
 
 // atf is the allocation table format
 package atf
 
 import (
 	"net"
+
+	"github.com/pkg/errors"
 )
 
 // IPNet represents a net.IPNet, only marshallable
@@ -32,21 +34,45 @@ type IPNet struct {
 }
 
 type File struct {
-	Name	    *string      `yaml:"name"`
+	Name        *string      `yaml:"name"`
 	Superblock  *IPNet       `yaml:"superBlock"`
 	Allocations []Allocation `yaml:"allocations"`
 }
 
 type Allocation struct {
-	IsReserved  bool       `yaml:"reserved,omitempty"`
-	Network     *IPNet     `yaml:"cidr"`
-	Description string     `yaml:"description"`
-	Reference   *Reference `yaml:"ref,omitempty"`
+	Ident       string       `yaml:"ident"`
+	IsReserved  bool         `yaml:"reserved,omitempty"`
+	Network     *IPNet       `yaml:"cidr"`
+	Description string       `yaml:"description,omitempty"`
+	Reference   Reference    `yaml:"ref,omitempty"`
+	SubAlloc    []Allocation `yaml:"subAlloc,omitempty"`
 }
 
 type Reference struct {
-	DocumentationURI  string `yaml:"documentedAt,omitempty"`
-	AWSCloudFormation string `yaml:"awsCF,omitempty"`
-	Git               string `yaml:"git,omitempty"`
-	SubAlloc          string `yaml:"subAlloc,omitempty"`
+	AWS   ReferenceAWS   `yaml:"aws,omitempty"`
+	Azure ReferenceAzure `yaml:"azure,omitempty"`
+
+	DocumentationURI *string `yaml:"documentedAt,omitempty"`
+	Git              *string `yaml:"git,omitempty"`
+}
+
+type ReferenceAzure struct {
+	Subscription   string `yaml:"subscription,omitempty"`
+	ResourceGroup  string `yaml:"resourceGroup,omitempty"`
+	VirtualNetwork string `yaml:"virtualNetwork,omitempty"`
+}
+
+type ReferenceAWS struct {
+	CloudFormationURL string `yaml:"cloudFormationUrl,omitempty"`
+}
+
+func (f *File) Validate() error {
+	for _, alloc := range f.Allocations {
+		for _, subAllocL1 := range alloc.SubAlloc {
+			if len(subAllocL1.SubAlloc) >= 1 {
+				return errors.Errorf("allocation %s has nested suballocations; this is not supported", alloc.Network.String())
+			}
+		}
+	}
+	return nil
 }

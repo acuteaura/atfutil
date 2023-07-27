@@ -17,7 +17,7 @@
    express or implied.
  * See the Licence for the specific language governing
    permissions and limitations under the Licence.
- */
+*/
 
 package atfutil
 
@@ -26,17 +26,18 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"os"
 
 	"github.com/pkg/errors"
 
+	"atfutil/pkg/netpool"
 	"atfutil/pkg/render"
 
 	"atfutil/pkg/netcalc"
 
-	"github.com/go-yaml/yaml"
 	"atfutil/pkg/atf"
+
+	"github.com/go-yaml/yaml"
 
 	"github.com/spf13/cobra"
 )
@@ -106,14 +107,6 @@ func loadAtfFromFile(inputFile *os.File) (*atf.File, error) {
 	return atf, nil
 }
 
-func netpoolFromAtf(atfFile *atf.File) (*netcalc.IPNetPool, error) {
-	ipNet := make([]*net.IPNet, 0, len(atfFile.Allocations))
-	for _, alloc := range atfFile.Allocations {
-		ipNet = append(ipNet, alloc.Network.IPNet)
-	}
-	return netcalc.NewIPNetPool(atfFile.Superblock.String(), ipNet...)
-}
-
 var validateCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "validate an input file to be valid atf and have no network overlap",
@@ -127,7 +120,7 @@ var validateCmd = &cobra.Command{
 		if err != nil {
 			quitWithError(err)
 		}
-		_, err = netpoolFromAtf(atf)
+		_, err = netpool.FromAtf(atf)
 		if err != nil {
 			quitWithError(err)
 		}
@@ -151,7 +144,7 @@ var renderCmd = &cobra.Command{
 		if err != nil {
 			quitWithError(err)
 		}
-		pool, err := netpoolFromAtf(atfFile)
+		pool, err := netpool.FromAtf(atfFile)
 		if err != nil {
 			quitWithError(err)
 		}
@@ -182,11 +175,11 @@ var allocCmd = &cobra.Command{
 	Short: "allocate a new subnet",
 	Long:  "allocate a new subnet, the smallest fitting free slice is automatically found and allocated to keep your IP space fragmentation low",
 	Run: func(cmd *cobra.Command, args []string) {
-		// output filename is set and in-place is set, 
+		// output filename is set and in-place is set,
 		if *outputFilename != "-" && *inPlace {
 			quitWithError(errors.New("cannot use --output-file and --in-place at the same time"))
 		}
-		
+
 		inFile, err := getInputFile(*inputFilename)
 		if err != nil {
 			quitWithError(err)
@@ -197,7 +190,7 @@ var allocCmd = &cobra.Command{
 		if err != nil {
 			quitWithError(err)
 		}
-		pool, err := netpoolFromAtf(atfFile)
+		pool, err := netpool.FromAtf(atfFile)
 		if err != nil {
 			quitWithError(err)
 		}
@@ -208,7 +201,8 @@ var allocCmd = &cobra.Command{
 			quitWithError(errors.Errorf("requested block size is out of range (%d < block < %d)", superAllocSize, netcalc.AWS_MIN_SUBNET_SIZE))
 		}
 
-		net, err := pool.Alloc(*allocSize)
+		// TODO: allow allocating from a suballocation with a flag
+		net, err := pool.Pool.Alloc(*allocSize)
 		if err != nil {
 			quitWithError(err)
 		}

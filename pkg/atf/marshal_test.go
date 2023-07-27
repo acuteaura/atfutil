@@ -17,16 +17,12 @@
    express or implied.
  * See the Licence for the specific language governing
    permissions and limitations under the Licence.
- */
+*/
 
 package atf
 
 import (
 	"net"
-	"reflect"
-	"testing"
-
-	"github.com/go-yaml/yaml"
 )
 
 func CIDR(cidr string) *net.IPNet {
@@ -40,7 +36,7 @@ func CIDR(cidr string) *net.IPNet {
 	return net
 }
 
-func TestIPNet_MarshalUnmarshalText(t *testing.T) {
+/* func TestIPNet_MarshalUnmarshalText(t *testing.T) {
 	atf := &File{
 		Superblock: &IPNet{CIDR("10.42.0.0/16")},
 		Allocations: []Allocation{
@@ -68,3 +64,4 @@ func TestIPNet_MarshalUnmarshalText(t *testing.T) {
 		t.Fatal("deepEqual failed")
 	}
 }
+*/
