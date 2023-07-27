@@ -1,6 +1,6 @@
 # atfutil
 
-a simple IPAM tool in go, plus my personal network allocations for reference
+a simple IPAM tool in go that stores allocations and arbitrary metadata in YAML, allows you to allocate from the smallest fitting block and renders allocations (and optionally the space between allocations) to a markdown table.
 
 ## Superblocks
 
