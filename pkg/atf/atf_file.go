@@ -34,18 +34,18 @@ type IPNet struct {
 }
 
 type File struct {
-	Name        *string      `yaml:"name"`
-	Superblock  *IPNet       `yaml:"superBlock"`
-	Allocations []Allocation `yaml:"allocations"`
+	Name        *string       `yaml:"name"`
+	Superblock  *IPNet        `yaml:"superBlock"`
+	Allocations []*Allocation `yaml:"allocations"`
 }
 
 type Allocation struct {
-	Ident       string       `yaml:"ident"`
-	IsReserved  bool         `yaml:"reserved,omitempty"`
-	Network     *IPNet       `yaml:"cidr"`
-	Description string       `yaml:"description,omitempty"`
-	Reference   Reference    `yaml:"ref,omitempty"`
-	SubAlloc    []Allocation `yaml:"subAlloc,omitempty"`
+	Ident       string        `yaml:"ident"`
+	IsReserved  bool          `yaml:"reserved,omitempty"`
+	Network     *IPNet        `yaml:"cidr"`
+	Description string        `yaml:"description,omitempty"`
+	Reference   Reference     `yaml:"ref,omitempty"`
+	SubAlloc    []*Allocation `yaml:"subAlloc,omitempty"`
 }
 
 type Reference struct {

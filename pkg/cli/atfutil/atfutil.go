@@ -151,7 +151,7 @@ var renderCmd = &cobra.Command{
 
 		switch *renderFormat {
 		case "markdown":
-			render.RenderPoolToMarkdown(outBuffer, atfFile, pool, *renderFree)
+			render.RenderPoolToMarkdown(outBuffer, pool, *renderFree)
 		default:
 			quitWithError(errors.New("unknown render format"))
 		}
@@ -207,7 +207,7 @@ var allocCmd = &cobra.Command{
 			quitWithError(err)
 		}
 
-		atfFile.Allocations = append(atfFile.Allocations, atf.Allocation{
+		atfFile.Allocations = append(atfFile.Allocations, &atf.Allocation{
 			Network:     &atf.IPNet{IPNet: net},
 			Description: *allocDesc,
 		})
