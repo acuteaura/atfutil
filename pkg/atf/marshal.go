@@ -17,13 +17,15 @@
    express or implied.
  * See the Licence for the specific language governing
    permissions and limitations under the Licence.
- */
+*/
 
 package atf
 
 import (
 	"fmt"
 	"net"
+
+	"github.com/pkg/errors"
 )
 
 func (ipn *IPNet) MarshalText() (text []byte, err error) {
@@ -33,9 +35,12 @@ func (ipn *IPNet) MarshalText() (text []byte, err error) {
 }
 
 func (ipn *IPNet) UnmarshalText(text []byte) error {
-	_, ipnet, err := net.ParseCIDR(string(text))
+	ip, ipnet, err := net.ParseCIDR(string(text))
 	if err != nil {
 		return err
+	}
+	if !ip.Equal(ipnet.IP) {
+		return errors.Errorf("provided non-net CIDR '%s', did you mean '%s'?", text, ipnet.String())
 	}
 	ipn.IPNet = ipnet
 	return nil

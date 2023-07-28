@@ -23,29 +23,28 @@ package atf
 
 import (
 	"net"
+	"reflect"
+	"testing"
+
+	"gopkg.in/yaml.v2"
 )
 
 func CIDR(cidr string) *net.IPNet {
-	ip, net, err := net.ParseCIDR(cidr)
+	_, net, err := net.ParseCIDR(cidr)
 	if err != nil {
 		panic("CIDR parsing failed")
 	}
-	if !net.IP.Equal(ip) {
-		panic("CIDR is not a network address")
-	}
+	// allow wrongness
 	return net
 }
 
-/* func TestIPNet_MarshalUnmarshalText(t *testing.T) {
+func TestIPNet_MarshalUnmarshalText(t *testing.T) {
 	atf := &File{
 		Superblock: &IPNet{CIDR("10.42.0.0/16")},
-		Allocations: []Allocation{
+		Allocations: []*Allocation{
 			{
 				Network:     &IPNet{CIDR("10.42.0.0/15")},
 				Description: "half the slice",
-				Reference: &Reference{
-					DocumentationURI: "https://kubernetes.io",
-				},
 			},
 		},
 	}
@@ -64,4 +63,17 @@ func CIDR(cidr string) *net.IPNet {
 		t.Fatal("deepEqual failed")
 	}
 }
-*/
+
+func TestIPNet_MarshalUnmarshalTextBadNet(t *testing.T) {
+	atf := `superBlock: 10.99.0.0/16
+allocations:
+- cidr: 10.99.43.0/23
+	`
+
+	atf2 := &File{}
+	err := yaml.Unmarshal([]byte(atf), atf2)
+
+	if err == nil {
+		t.Fatal("unmarshalled bad data")
+	}
+}

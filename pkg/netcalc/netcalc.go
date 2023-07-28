@@ -17,17 +17,18 @@
    express or implied.
  * See the Licence for the specific language governing
    permissions and limitations under the Licence.
- */
+*/
 
 package netcalc
 
 import (
 	"encoding/binary"
-	"errors"
 	"net"
 	"sort"
 
 	"atfutil/pkg/cidr"
+
+	"github.com/pkg/errors"
 )
 
 const AWS_MIN_SUBNET_SIZE = 28
@@ -206,6 +207,14 @@ func NewIPNetPool(superCidr string, allocations ...*net.IPNet) (*IPNetPool, erro
 	}
 	if !super.IP.Equal(ip) {
 		return nil, ErrRootNotNetworkAddr
+	}
+
+	for _, allocation := range allocations {
+		ip := allocation.IP
+		ipMasked := allocation.IP.Mask(allocation.Mask)
+		if !ip.Equal(ipMasked) {
+			return nil, errors.Errorf("used non-set IP %s (did you mean %s?)", ip.String(), ipMasked.String())
+		}
 	}
 
 	ipnp := &IPNetPool{super, allocations}
