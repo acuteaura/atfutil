@@ -263,5 +263,5 @@ func init() {
 
 	allocSize = allocCmd.Flags().IntP("size", "s", -1, "size of the network to allocate")
 	allocDesc = allocCmd.Flags().StringP("description", "d", "", "description for the newly allocated subnet")
-	inPlace = allocCmd.PersistentFlags().BoolP("in-place", "i", false, "modify the input file in place")
+	inPlace = allocCmd.PersistentFlags().Bool("in-place", false, "modify the input file in place")
 }
